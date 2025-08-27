@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forest Player — Birthday Edition</title>
+
+<!-- Icons + Font -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* Tu paleta base */
+    --green-1:#196C2C; /* principal */
+    --green-2:#18582A;
+    --green-3:#90C099;
+    --green-4:#10421B;
+    /* complementos suaves */
+    --cream:#F6F7F2;
+    --mint:#EAF5EC;
+    --ink:#1F2A24;
+    --glass: rgba(255,255,255,.6);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(60vmax 60vmax at -10% -10%, #e7faef 0%, transparent 60%),
+      radial-gradient(50vmax 50vmax at 110% 0%, #fdf4ea 0%, transparent 60%),
+      linear-gradient(135deg, #f7fbf8 0%, #f2f7f3 40%, #f8fbf6 100%);
+    overflow:hidden;
+  }
+
+  /* -------- Login -------- */
+  .login-wrap{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#eaf5ec 0%, #fdf7f0 100%);
+  }
+  .login{
+    width:min(92vw,420px);
+    background:rgba(255,255,255,.75);
+    backdrop-filter: blur(10px);
+    border:1px solid rgba(16,66,27,.08);
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 15px 40px rgba(16,66,27,.15);
+    position:relative;
+    overflow:hidden;
+  }
+  .login h1{
+    margin:0 0 6px; font-size:24px; font-weight:700; color:var(--green-4);
+    letter-spacing:.2px;
+  }
+  .login p{margin:0 0 18px; color:#3c4a41; font-size:14px}
+  .field{display:flex; flex-direction:column; gap:6px; margin:10px 0 14px}
+  .field label{font-size:12px; color:#3b5143}
+  .field input{
+    padding:12px 14px; border-radius:12px; border:1px solid #d9e7dc; background:#fff;
+    outline:none; font-size:14px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 16px; border:none; border-radius:14px; cursor:pointer;
+    font-weight:600; background:linear-gradient(180deg,var(--green-1),var(--green-4));
+    color:#fff; box-shadow:0 8px 18px rgba(25,108,44,.28);
+    transition:transform .06s ease, filter .2s ease;
+    width:100%;
+  }
+  .btn:active{transform:translateY(1px)}
+  .hint{margin-top:10px; font-size:12px; color:#5b6a60}
+  .hint code{background:#eef6f0; padding:2px 6px; border-radius:6px}
+
+  /* -------- App layout -------- */
+  .app{display:grid; grid-template-columns:260px 1fr; grid-template-rows:70px 1fr; height:100vh; gap:0 0; display:none}
+  .sidebar{
+    grid-row:1 / span 2;
+    background:linear-gradient(180deg, rgba(144,192,153,.35), rgba(25,108,44,.12));
+    border-right:1px solid rgba(16,66,27,.1);
+    padding:18px 14px; overflow:auto;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:14px;
+    background:rgba(255,255,255,.65); backdrop-filter: blur(6px);
+    border:1px solid rgba(16,66,27,.08);
+  }
+  .brand i{
+    width:36px; height:36px; display:grid; place-items:center; border-radius:10px;
+    background:linear-gradient(160deg,var(--green-3),#d9f0de);
+    color:var(--green-4); box-shadow: inset 0 0 0 1px rgba(16,66,27,.06);
+  }
+  .brand b{font-size:16px}
+
+  .nav{margin-top:18px; display:grid; gap:6px}
+  .nav a{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; text-decoration:none;
+    color:#2e4036; border-radius:12px; font-size:14px; font-weight:500;
+    transition:background .2s ease, transform .05s ease;
+  }
+  .nav a:hover{background:rgba(255,255,255,.7)}
+  .nav a:active{transform:translateY(1px)}
+
+  .header{
+    grid-column:2; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px;
+    background:rgba(255,255,255,.7); backdrop-filter: blur(8px);
+    border-bottom:1px solid rgba(16,66,27,.08);
+  }
+  .search{
+    display:flex; align-items:center; gap:8px; padding:10px 12px; width:min(520px,48vw);
+    background:#fff; border:1px solid #dfece2; border-radius:12px;
+    box-shadow: 0 4px 12px rgba(16,66,27,.06) inset;
+  }
+  .search input{border:none; outline:none; width:100%; font-size:14px}
+
+  .profile{
+    display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none;
+    background:rgba(255,255,255,.8); border:1px solid rgba(16,66,27,.08);
+    padding:6px 10px; border-radius:20px;
+  }
+  .profile img{width:28px; height:28px; border-radius:50%}
+  .dropdown{
+    position:absolute; right:20px; top:60px; background:#fff; border:1px solid #e5efe7;
+    border-radius:12px; box-shadow:0 15px 30px rgba(16,66,27,.15); display:none; overflow:hidden;
+  }
+  .dropdown a{display:flex; align-items:center; gap:10px; padding:10px 14px; color:#294235; text-decoration:none; font-size:14px}
+  .dropdown a:hover{background:#f3faf5}
+
+  .main{grid-column:2; overflow:auto; position:relative}
+
+  /* Floating clovers */
+  .clovers{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+  .clovers span{
+    position:absolute; width:16px; height:16px; background:radial-gradient(circle at 30% 30%, #c8e8cf 0, #8cbf95 60%, #79a985 100%);
+    clip-path: path("M8,0 C12,5 16,8 8,16 C0,8 4,5 8,0 Z");
+    opacity:.35; filter:blur(.2px);
+    animation: drift 12s linear infinite;
+  }
+  @keyframes drift{
+    from{transform: translateY(10vh) translateX(0) rotate(0deg)}
+    to  {transform: translateY(-110vh) translateX(40px) rotate(180deg)}
+  }
+
+  /* Player panel */
+  .player-hero{
+    display:grid; grid-template-columns:280px 1fr; gap:24px; padding:22px 22px 16px;
+  }
+  .cover{
+    width:100%; aspect-ratio:1/1; border-radius:18px; overflow:hidden;
+    box-shadow:0 18px 40px rgba(16,66,27,.18);
+    border:1px solid rgba(16,66,27,.12);
+  }
+  .cover img{width:100%; height:100%; object-fit:cover; display:block}
+
+  .info h2{margin:0; font-size:24px; color:var(--green-4)}
+  .info p{margin:6px 0 14px; color:#3c4a41}
+  .controls{display:flex; align-items:center; gap:14px}
+  .icon-btn{
+    width:42px; height:42px; border-radius:14px; border:1px solid rgba(25,108,44,.18);
+    background:linear-gradient(180deg,#ffffff,#f2faf4); color:var(--green-4); display:grid; place-items:center;
+    cursor:pointer; box-shadow:0 8px 18px rgba(16,66,27,.08); transition:transform .06s ease, filter .2s ease;
+  }
+  .icon-btn:hover{filter:brightness(1.02)}
+  .icon-btn:active{transform:translateY(1px)}
+  .play{
+    width:54px; height:54px; border-radius:18px;
+    background:linear-gradient(180deg,var(--green-3),#b9e2c0); color:var(--green-4);
+    border:1px solid rgba(16,66,27,.18);
+  }
+  .progress{
+    margin-top:14px; height:8px; width:100%; background:#e6f0e9; border-radius:10px; overflow:hidden;
+    box-shadow: inset 0 1px 3px rgba(16,66,27,.08);
+  }
+  .bar{height:100%; width:0%; background:linear-gradient(90deg,var(--green-1),var(--green-3)); transition:width .2s linear}
+
+  /* Lists */
+  .section{padding:8px 22px 26px}
+  .section h3{margin:8px 0 14px; font-size:16px; color:#2a3f33}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:16px}
+  .card{
+    background:rgba(255,255,255,.7); border:1px solid #e1eee6; padding:10px; border-radius:16px;
+    transition:transform .15s ease, box-shadow .2s ease; cursor:pointer;
+  }
+  .card:hover{transform:translateY(-3px); box-shadow:0 10px 24px rgba(16,66,27,.12)}
+  .thumb{width:100%; aspect-ratio:1/1; border-radius:12px; overflow:hidden; margin-bottom:8px}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+  .title{font-size:14px; font-weight:600}
+  .sub{font-size:12px; opacity:.7}
+
+  .tracklist{margin-top:8px; border-top:1px dashed #d7e7dc; padding-top:10px; display:grid; gap:6px}
+  .track{
+    display:grid; grid-template-columns:24px 1fr 28px; gap:10px; align-items:center;
+    padding:8px 10px; border-radius:10px; background:#ffffffb3; border:1px solid #e4efe8;
+  }
+  .track .name{font-size:14px}
+  .track .more{opacity:.6}
+  .track:hover{background:#f4fbf6}
+
+  /* Modal */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.25); display:none; align-items:center; justify-content:center; padding:20px}
+  .dialog{
+    width:min(680px,92vw); background:linear-gradient(180deg,#ffffff,#f4faf6);
+    border:1px solid #dfece5; border-radius:18px; padding:22px; box-shadow:0 22px 60px rgba(16,66,27,.25);
+    position:relative;
+  }
+  .dialog h4{margin:0 0 6px; color:var(--green-4)}
+  .dialog p{margin:0; color:#2f4036; line-height:1.65}
+  .dialog .close{
+    position:absolute; right:12px; top:12px; width:36px; height:36px; border-radius:12px;
+    display:grid; place-items:center; border:1px solid #e1eee6; background:#fff; cursor:pointer;
+  }
+
+  /* Responsive */
+  @media (max-width:900px){
+    .player-hero{grid-template-columns:1fr; }
+    .cover{max-width:380px; justify-self:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section class="login-wrap" id="login">
+  <div class="login">
+    <h1><i class="fa-solid fa-leaf" style="color:#196C2C"></i> Forest Player</h1>
+    <p>Accede para ver tus playlists y mensajes personalizados.</p>
+    <div class="field">
+      <label>Usuario</label>
+      <input id="user" placeholder="Escribe tu usuario" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password">
+    </div>
+    <button class="btn" id="btnLogin"><i class="fa-solid fa-door-open"></i> Entrar</button>
+    <div class="hint">Demo — Usuario: <code>ivy</code> · Contraseña: <code>forest90</code></div>
+  </div>
+</section>
+
+<!-- APP -->
+<section class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <i class="fa-solid fa-cassette-tape"></i>
+      <b>Forest Player</b>
+    </div>
+    <nav class="nav">
+      <a href="#"><i class="fa-solid fa-house"></i> Inicio</a>
+      <a href="#"><i class="fa-solid fa-list-ul"></i> Playlists</a>
+      <a href="#"><i class="fa-solid fa-heart"></i> Favoritos</a>
+      <a href="#"><i class="fa-solid fa-gear"></i> Ajustes</a>
+    </nav>
+  </aside>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass" style="color:#196C2C"></i>
+      <input id="search" placeholder="Buscar canciones o playlists…">
+    </div>
+    <div style="position:relative">
+      <div class="profile" id="profileBtn">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" alt="profile">
+        <span>Hola, Mariana <3</span>
+        <i class="fa-solid fa-chevron-down" style="font-size:12px; opacity:.6"></i>
+      </div>
+      <div class="dropdown" id="dropdown">
+        <a href="#"><i class="fa-regular fa-user"></i> Perfil</a>
+        <a href="#"><i class="fa-solid fa-leaf"></i> Tema</a>
+        <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Floating clovers -->
+    <div class="clovers" id="clovers"></div>
+
+    <!-- Player hero -->
+    <section class="player-hero">
+      <div class="cover"><img id="heroCover" alt="cover"></div>
+      <div class="info">
+        <h2 id="heroTitle">—</h2>
+        <p id="heroDesc">Haz clic en cualquier playlist para empezar.</p>
+
+        <div class="controls">
+          <button class="icon-btn" id="prev"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="icon-btn play" id="play"><i class="fa-solid fa-play"></i></button>
+          <button class="icon-btn" id="next"><i class="fa-solid fa-forward-step"></i></button>
+          <button class="icon-btn" id="shuffle"><i class="fa-solid fa-shuffle"></i></button>
+          <button class="icon-btn" id="repeat"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+
+        <div class="tracklist" id="tracklist"></div>
+      </div>
+    </section>
+
+    <!-- Playlists -->
+    <section class="section">
+      <h3>Playlists</h3>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
+</section>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="dialog">
+    <button class="close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+    <h4 id="modalTitle"></h4>
+    <p id="modalMsg"></p>
+  </div>
+</div>
+
+<script>
+/* -------- Data -------- */
+const albums = [
+  {
+    title:"Recuerdos Verdes",
+    by:"De ti para ella",
+    cover:"https://i.ibb.co/39jpb1kw/0be1608a39a027dd1946b495a040890c.jpg",
+    desc:"Para días tranquilos, aire fresco y café helado entre margaritas.",
+    tracks:[
+      { name:"Día 1 · Flores", msg:"Que este año te florezca en calma y te encuentre rodeada de cosas bonitas." },
+      { name:"Día 2 · Camino", msg:"Sigue apostando por tus metas. Tu disciplina y enfoque hacen la diferencia." },
+      { name:"Día 3 · Bosque", msg:"En cada reto, recuerda que cuentas conmigo. Te apoyo en lo que necesites." }
+    ]
+  },
+  {
+    title:"Chocolate Late Night",
+    by:"Edición especial",
+    cover:"https://i.ibb.co/qM93krYL/6871d63678c6c1bbea7895c6ec2bb792.jpg",
+    desc:"Para noches largas de ideas y chocolate amargo.",
+    tracks:[
+      { name:"70% Cacao", msg:"Tu inteligencia y constancia inspiran. Gracias por poner tanto corazón en lo que haces." },
+      { name:"Notas de Vainilla", msg:"Tus proyectos merecen llegar lejos. Confío en lo que construyes." },
+      { name:"Aftertaste", msg:"Que cada logro te recuerde lo capaz que eres; aquí estoy para celebrarlos contigo." }
+    ]
+  },
+  {
+    title:"Spidey B-Sides",
+    by:"Un guiño discreto",
+    cover:"https://i.ibb.co/99b9cHzR/9b972c3a09d78e4e902e7bdb41995815.jpg",
+    desc:"Pequeños easter eggs para una heroína atenta a los detalles.",
+    tracks:[
+      { name:"Across the City", msg:"Tienes la valentía de empezar una y otra vez; ese es tu superpoder." },
+      { name:"Web Patterns", msg:"Tu forma de pensar encuentra conexiones donde otros solo ven ruido." },
+      { name:"Rooftop Wind", msg:"Respira. Estás haciendo las cosas muy bien." }
+    ]
+  },
+  {
+    title:"Detalles",
+    by:"Atención al mínimo gesto",
+    cover:"https://i.ibb.co/xtZ26gsx/8d8765cc0fbd8657b7848b7f2d80319f.jpg",
+    desc:"Porque lo pequeño también es grande.",
+    tracks:[
+      { name:"Nota pegada", msg:"Tus detalles hablan de tu gran corazón. Gracias por ser así." },
+      { name:"Cinta verde", msg:"Tu mirada paciente mejora todo lo que toca." }
+    ]
+  },
+  {
+    title:"Alegría Pura",
+    by:"Luz natural",
+    cover:"https://i.ibb.co/FLGK2HYJ/4e5d44231368eca60cb18d36d9612d65.jpg",
+    desc:"Para que no falten sonrisas.",
+    tracks:[
+      { name:"Rayo de Sol", msg:"Tu alegría es contagiosa. Ojalá este año te devuelva el doble." },
+      { name:"Eco", msg:"Tus pasos dejan huella bonita; sigue." }
+    ]
+  },
+  {
+    title:"Brillantez",
+    by:"Mindset",
+    cover:"https://i.ibb.co/B5Xb2HBc/3a508477602e237b91fca0cd3338c941.jpg",
+    desc:"Ideas claras y metas firmes.",
+    tracks:[
+      { name:"Blueprint", msg:"Tu estrategia y disciplina son tu ventaja. Confía." },
+      { name:"Focus", msg:"Cuando dudes, vuelve a lo esencial: tú puedes." }
+    ]
+  }
+];
+
+/* -------- Login -------- */
+const loginEl = document.getElementById('login');
+const appEl = document.getElementById('app');
+const btnLogin = document.getElementById('btnLogin');
+btnLogin.addEventListener('click', () => {
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value.trim();
+  if(u==='ivy' && p==='forest90'){
+    localStorage.setItem('fp_session','ok');
+    loginEl.style.display='none';
+    appEl.style.display='grid';
+    init();
+  }else{
+    alert('Usuario o contraseña incorrectos.');
+  }
+});
+if(localStorage.getItem('fp_session')==='ok'){
+  loginEl.style.display='none'; appEl.style.display='grid'; init();
+}
+
+/* -------- UI init -------- */
+const grid = document.getElementById('grid');
+const tracklist = document.getElementById('tracklist');
+const heroCover = document.getElementById('heroCover');
+const heroTitle = document.getElementById('heroTitle');
+const heroDesc = document.getElementById('heroDesc');
+const bar = document.getElementById('bar');
+
+let currentAlbum = 0, currentTrack = 0, playing = false, progressTimer=null, progress=0;
+
+function init(){
+  // Populate playlists grid
+  grid.innerHTML = '';
+  albums.forEach((a,idx)=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `
+      <div class="thumb"><img src="${a.cover}" alt=""></div>
+      <div class="title">${a.title}</div>
+      <div class="sub">${a.by}</div>`;
+    card.addEventListener('click', ()=> loadAlbum(idx));
+    grid.appendChild(card);
+  });
+  // load first
+  loadAlbum(0);
+  // floating clovers
+  spawnClovers();
+}
+
+/* -------- Album / Tracks -------- */
+function loadAlbum(idx){
+  currentAlbum = idx; currentTrack = 0; progress=0; bar.style.width='0%';
+  const a = albums[idx];
+  heroCover.src = a.cover;
+  heroTitle.textContent = a.title;
+  heroDesc.textContent = a.desc;
+  // tracklist
+  tracklist.innerHTML = '';
+  a.tracks.forEach((t,i)=>{
+    const row = document.createElement('div');
+    row.className='track';
+    row.innerHTML = `
+      <span style="text-align:center; color:#587963">${i+1}</span>
+      <div class="name">${t.name}</div>
+      <button class="icon-btn" title="Ver mensaje"><i class="fa-regular fa-message"></i></button>
+    `;
+    row.addEventListener('click', (e)=>{
+      if(e.target.closest('button')) openMessage(i);
+      else { currentTrack = i; play(); }
+    });
+    tracklist.appendChild(row);
+  });
+}
+
+/* -------- Modal -------- */
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMsg = document.getElementById('modalMsg');
+document.getElementById('closeModal').onclick = ()=> modal.style.display='none';
+
+function openMessage(i){
+  const a = albums[currentAlbum];
+  modalTitle.textContent = `${a.title} • ${a.tracks[i].name}`;
+  modalMsg.textContent = a.tracks[i].msg;
+  modal.style.display='flex';
+}
+
+/* -------- Player controls (fake progress) -------- */
+document.getElementById('play').onclick = ()=> playing ? pause() : play();
+document.getElementById('prev').onclick = ()=> { step(-1); }
+document.getElementById('next').onclick = ()=> { step(1); }
+document.getElementById('shuffle').onclick = ()=> {
+  const len = albums[currentAlbum].tracks.length;
+  currentTrack = Math.floor(Math.random()*len);
+  play(true);
+};
+document.getElementById('repeat').onclick = ()=> { progress=0; bar.style.width='0%'; play(true); };
+
+function play(reset=false){
+  playing=true;
+  document.getElementById('play').innerHTML = '<i class="fa-solid fa-pause"></i>';
+  if(reset){ progress=0; bar.style.width='0%'; }
+  clearInterval(progressTimer);
+  progressTimer = setInterval(()=>{
+    progress += 1.2; // velocidad
+    if(progress>=100){ step(1); }
+    bar.style.width = Math.min(progress,100)+'%';
+  }, 180);
+}
+function pause(){
+  playing=false;
+  document.getElementById('play').innerHTML = '<i class="fa-solid fa-play"></i>';
+  clearInterval(progressTimer);
+}
+function step(dir){
+  const len = albums[currentAlbum].tracks.length;
+  currentTrack = (currentTrack + dir + len) % len;
+  progress=0; bar.style.width='0%';
+  play(true);
+}
+
+/* -------- Profile dropdown + logout -------- */
+const profileBtn = document.getElementById('profileBtn');
+const dropdown = document.getElementById('dropdown');
+profileBtn.addEventListener('click', ()=>{
+  dropdown.style.display = dropdown.style.display==='block' ? 'none' : 'block';
+});
+document.getElementById('logout').addEventListener('click', ()=>{
+  localStorage.removeItem('fp_session'); location.reload();
+});
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('#profileBtn') && !e.target.closest('#dropdown')){
+    dropdown.style.display='none';
+  }
+});
+
+/* -------- Search (filtra grid por título) -------- */
+document.getElementById('search').addEventListener('input', e=>{
+  const q = e.target.value.toLowerCase();
+  [...grid.children].forEach(card=>{
+    const title = card.querySelector('.title').textContent.toLowerCase();
+    card.style.display = title.includes(q) ? '' : 'none';
+  });
+});
+
+/* -------- Clover particles -------- */
+function spawnClovers(){
+  const layer = document.getElementById('clovers');
+  layer.innerHTML='';
+  for(let i=0;i<22;i++){
+    const s=document.createElement('span');
+    s.style.left = (Math.random()*100)+'%';
+    s.style.bottom = (-10 - Math.random()*30)+'px';
+    s.style.animationDelay = (Math.random()*-12)+'s';
+    s.style.opacity = .18 + Math.random()*.25;
+    s.style.transform = `scale(${.6 + Math.random()*1.2})`;
+    layer.appendChild(s);
+  }
+}
+</script>
+</body>
+</html>
