@@ -274,7 +274,7 @@
       <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password">
     </div>
     <button class="btn" id="btnLogin"><i class="fa-solid fa-door-open"></i> Entrar</button>
-    <div class="hint">Demo — Usuario: <code>ivy</code> · Contraseña: <code>forest90</code></div>
+    <div class="hint">Demo — Usuario: <code>01000011</code> · Contraseña: <code>01000001</code></div>
   </div>
 </section>
 
@@ -431,7 +431,7 @@ const btnLogin = document.getElementById('btnLogin');
 btnLogin.addEventListener('click', () => {
   const u = document.getElementById('user').value.trim();
   const p = document.getElementById('pass').value.trim();
-  if(u==='ivy' && p==='forest90'){
+  if(u==='01000011' && p==='01000001'){
     sessionStorage.setItem('fp_session','ok');
     loginEl.style.display='none';
     appEl.style.display='grid';
