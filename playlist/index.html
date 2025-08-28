@@ -219,6 +219,43 @@
     .player-hero{grid-template-columns:1fr; }
     .cover{max-width:380px; justify-self:center}
   }
+
+  @media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .sidebar {
+    grid-row:auto;
+    grid-column:1;
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+    border-right:none;
+    border-bottom:1px solid rgba(16,66,27,.1);
+  }
+  .brand {display:none;} /* oculta logo en móvil para ganar espacio */
+  .nav {display:flex; gap:10px; margin:0;}
+
+  .header {
+    flex-direction: column;
+    gap:10px;
+    padding:10px;
+  }
+  .search {
+    width:100%;
+  }
+
+  .player-hero {
+    grid-template-columns:1fr;
+    padding:12px;
+  }
+  .cover {
+    max-width:240px;
+    margin:auto;
+  }
+}
 </style>
 </head>
 <body>
@@ -395,7 +432,7 @@ btnLogin.addEventListener('click', () => {
   const u = document.getElementById('user').value.trim();
   const p = document.getElementById('pass').value.trim();
   if(u==='ivy' && p==='forest90'){
-    localStorage.setItem('fp_session','ok');
+    sessionStorage.setItem('fp_session','ok');
     loginEl.style.display='none';
     appEl.style.display='grid';
     init();
@@ -403,7 +440,7 @@ btnLogin.addEventListener('click', () => {
     alert('Usuario o contraseña incorrectos.');
   }
 });
-if(localStorage.getItem('fp_session')==='ok'){
+if(sessionStorage.getItem('fp_session')==='ok'){
   loginEl.style.display='none'; appEl.style.display='grid'; init();
 }
 
@@ -515,7 +552,7 @@ profileBtn.addEventListener('click', ()=>{
   dropdown.style.display = dropdown.style.display==='block' ? 'none' : 'block';
 });
 document.getElementById('logout').addEventListener('click', ()=>{
-  localStorage.removeItem('fp_session'); location.reload();
+  sessionStorage.removeItem('fp_session'); location.reload();
 });
 document.addEventListener('click',(e)=>{
   if(!e.target.closest('#profileBtn') && !e.target.closest('#dropdown')){
