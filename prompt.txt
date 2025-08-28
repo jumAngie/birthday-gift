@@ -1,3 +1,0 @@
-Necesito arreglar dos cosas de este código:
-1. Cuando hago cambios en el código y actualizo y quiero ver los cambios la pagina se queda como pegada y no carga nada. Me toca ir a la consolay manualmente borrar la sesión para poder volver a ingresar y que me permita ver el sitio.
-2. Necesito que tenga diseño responsive para poder verse en celulares de forma apropiada.
